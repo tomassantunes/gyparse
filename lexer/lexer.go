@@ -32,7 +32,6 @@ const (
     TokenTypeNull       TokenType = "NULL" 
 
     // Other
-    TokenTypeComment TokenType = "COMMENT"  // '#'
     TokenTypeEOF     TokenType = "EOF"
 )
 
@@ -52,33 +51,62 @@ func Lex(lines []string) []Token {
             tokens = append(tokens, Token{Type: TokenTypeDocumentEnd, Value: line})
             break
         } else if strings.Contains(line, "#") {
-            fmt.Println("Comment found: ", line)
             tmp := strings.SplitN(line, "#", 2)
+
+            if strings.TrimSpace(tmp[0]) == "" {
+                continue
+            }
+
             line = tmp[0]
-            fmt.Println("Line after comment removal: ", line)
         }
 
         for idx, char := range line {
             switch char {
             case '-':
+                if strings.Contains(line, ":") {
+                    tmpTokens := getListStartOrKeyValue(line, idx)
+                    if len(tmpTokens) > 0 {
+                        tokens = append(tokens, tmpTokens...)
+                        break
+                    }
+                }
                 tokens = append(tokens, Token{Type: TokenTypeListItem, Value: strings.TrimSpace(line[idx + 1:])})
                 break
             case ':':
-                if idx == len(line) - 1 {
-                    tokens = append(tokens, Token{Type: TokenTypeListStart, Value: strings.TrimSpace(line[:idx])})
-                    break
-                } else if line[idx + 1] == ' ' {
-                    tmp := strings.SplitN(line, ":", 2)
-                    tokens = append(tokens, Token{Type: TokenTypeKey, Value: strings.TrimSpace(tmp[0])})
-                    tokens = append(tokens, Token{Type: TokenTypeString, Value: strings.TrimSpace(tmp[1])})
+                tmpTokens := getListStartOrKeyValue(line, idx)
+                if len(tmpTokens) > 0 {
+                    tokens = append(tokens, tmpTokens...)
                     break
                 }
-                
+            case ' ':
+                fmt.Println(line, idx)
+
+                tokens = append(tokens, Token{Type: TokenTypeIndent, Value: " "})
+                continue
             default:
-                fmt.Println("Unknown character:", char)
+                fmt.Println("Unknown character: ", char, string(char))
+                continue
             }
+
+            break
         }
     }
 
     return tokens 
+}
+
+func getListStartOrKeyValue(line string, idx int) []Token {
+    var tokens []Token
+
+    trimmed := strings.TrimSpace(line)
+
+    if idx == len(line) - 1 || trimmed[len(trimmed) - 1] == ':' {
+        tokens = append(tokens, Token{Type: TokenTypeListStart, Value: strings.TrimSpace(line[:idx])})
+    } else if line[idx + 1] == ' ' {
+        tmp := strings.SplitN(line, ":", 2)
+        tokens = append(tokens, Token{Type: TokenTypeKey, Value: strings.TrimSpace(tmp[0])})
+        tokens = append(tokens, Token{Type: TokenTypeString, Value: strings.TrimSpace(tmp[1])})
+    }
+
+    return tokens
 }
