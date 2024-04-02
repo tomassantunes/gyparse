@@ -108,6 +108,11 @@ func Lex(input string) []Token {
     return tokens 
 }
 
+// implementar a função isKeyword (true, false, null...)
+// fazer com que cleanBuilder retorne um género de um tuple
+// com o tipo de keyword, ou tipo de dados
+// e o conteúdo em si do builder
+
 func cleanBuilder(sb *strings.Builder) string {
     content := sb.String()
     sb.Reset()
