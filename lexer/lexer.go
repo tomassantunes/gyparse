@@ -1,8 +1,6 @@
 package lexer
 
 import (
-    //"unicode"
-    "fmt"
     "strings"
 )
 
@@ -10,103 +8,109 @@ type TokenType string
 
 const (
     // Structural
-    TokenTypeDocumentStart TokenType = "DOC_START"
-    TokenTypeDocumentEnd   TokenType = "DOC_END"
-    TokenTypeIndent        TokenType = "INDENT"
-    TokenTypeDedent        TokenType = "DEDENT"
-    TokenTypeListStart     TokenType = "LIST_START"
-    TokenTypeListItem      TokenType = "LIST_ITEM"  // '-' for list items 
-    TokenTypeFlowSeqStart  TokenType = "FLOW_SEQ_START"  // '['
-    TokenTypeFlowSeqEnd    TokenType = "FLOW_SEQ_END"    // ']'
-    TokenTypeFlowMapStart  TokenType = "FLOW_MAP_START"  // '{'
-    TokenTypeFlowMapEnd    TokenType = "FLOW_MAP_END"    // '}'
+    DocumentStart TokenType = "DOC_START"
+    DocumentEnd   TokenType = "DOC_END"
+    Indent        TokenType = "INDENT"
+    Dedent        TokenType = "DEDENT"
+    ListItem      TokenType = "LIST_ITEM"  // '-' for list items 
+    LeftParen     TokenType = "LEFT_PAREN" // '('
+    RightParen    TokenType = "RIGHT_PAREN"// ')'
+    LeftBracket   TokenType = "LEFT_BRACKET" // '['
+    RightBracket  TokenType = "RIGHT_BRACKET" // ']'
+    LeftBrace     TokenType = "LEFT_BRACE" // '{'
+    RightBrace    TokenType = "RIGHT_BRACE" // '}'
+    Ampersand     TokenType = "AMPERSAND" // '&'
+    Asterisk      TokenType = "ASTERISK" // '*'
+    Bang          TokenType = "BANG" // '!'
+    VertBar       TokenType = "VERT_BAR" // '|'
+    GreaterThan   TokenType = "GREATER_THAN" // '>'
+    SingleQuote   TokenType = "SINGLE_QUOTE" // '`'
+    DoubleQuote   TokenType = "DOUBLE_QUOTE" // '"'
+    Percent       TokenType = "PERCENT" // '%'
 
     // Key-Value
-    TokenTypeKey   TokenType = "KEY"
-    TokenTypeColon TokenType = "COLON"  // ':' 
+    Key   TokenType = "KEY" // '?' ??
+    Colon TokenType = "COLON"  // ':' 
 
     // Values
-    TokenTypeString     TokenType = "STRING"
-    TokenTypeNumber     TokenType = "NUMBER"
-    TokenTypeBool       TokenType = "BOOL"
-    TokenTypeNull       TokenType = "NULL" 
+    String     TokenType = "STRING"
+    Number     TokenType = "NUMBER"
+    Bool       TokenType = "BOOL"
+    Null       TokenType = "NULL" 
 
     // Other
-    TokenTypeEOF     TokenType = "EOF"
+    EOF     TokenType = "EOF"
 )
 
 type Token struct {
     Type  TokenType
-    Value string 
+    Lexeme string
+    Literal interface{}
+    Line int
 }
 
-func Lex(lines []string) []Token {
+func Lex(input string) []Token {
     var tokens []Token
+    var start int = 0
+    var current int = 0
+    var line int = 1
 
-    for _, line := range lines {
-        if line == "---" {
-            tokens = append(tokens, Token{Type: TokenTypeDocumentStart, Value: line})
-            continue
-        } else if line == "..." {
-            tokens = append(tokens, Token{Type: TokenTypeDocumentEnd, Value: line})
-            break
-        } else if strings.Contains(line, "#") {
-            tmp := strings.SplitN(line, "#", 2)
+    var hasStarted bool = false
 
-            if strings.TrimSpace(tmp[0]) == "" {
-                continue
+    var currLexeme strings.Builder
+
+    for current < len(input) {
+        start = current
+        c := input[current]
+
+        switch c {
+        case '\n':
+            if currLexeme.Len() > 0 {
+                tokens = append(tokens, Token{Type: String, Lexeme: cleanBuilder(&currLexeme), Line: line})
             }
 
-            line = tmp[0]
-        }
-
-        for idx, char := range line {
-            switch char {
-            case '-':
-                if strings.Contains(line, ":") {
-                    tmpTokens := getListStartOrKeyValue(line, idx)
-                    if len(tmpTokens) > 0 {
-                        tokens = append(tokens, tmpTokens...)
-                        break
-                    }
-                }
-                tokens = append(tokens, Token{Type: TokenTypeListItem, Value: strings.TrimSpace(line[idx + 1:])})
+            line++
+        case ' ', '\r', '\t':
+            // Ignore whitespace
+            if currLexeme.Len() > 0 {
+                tokens = append(tokens, Token{Type: String, Lexeme: cleanBuilder(&currLexeme), Line: line})
+            }
+        case '-':
+            if !hasStarted && input[start:start + 3] == "---" {
+                tokens = append(tokens, Token{Type: DocumentStart, Lexeme: "---", Line: line})
+                current += 2
+                hasStarted = true
                 break
-            case ':':
-                tmpTokens := getListStartOrKeyValue(line, idx)
-                if len(tmpTokens) > 0 {
-                    tokens = append(tokens, tmpTokens...)
-                    break
-                }
-            case ' ':
-                fmt.Println(line, idx)
-
-                tokens = append(tokens, Token{Type: TokenTypeIndent, Value: " "})
-                continue
-            default:
-                fmt.Println("Unknown character: ", char, string(char))
-                continue
             }
 
-            break
+            tokens = append(tokens, Token{Type: ListItem, Lexeme: string(c), Line: line})
+        case ':':
+            if currLexeme.Len() > 0 {
+                tokens = append(tokens, Token{Type: String, Lexeme: cleanBuilder(&currLexeme), Line: line})
+            }
+
+            tokens = append(tokens, Token{Type: Colon, Lexeme: string(c), Line: line})
+        case '#':
+            if currLexeme.Len() > 0 {
+                tokens = append(tokens, Token{Type: String, Lexeme: cleanBuilder(&currLexeme), Line: line})
+            }
+
+            for input[current + 1] != '\n' {
+                current++
+            }
+        default:
+            currLexeme.WriteByte(c)
         }
+
+        current++
     }
 
     return tokens 
 }
 
-func getListStartOrKeyValue(line string, idx int) []Token {
-    var tokens []Token
+func cleanBuilder(sb *strings.Builder) string {
+    content := sb.String()
+    sb.Reset()
 
-    trimmed := strings.TrimSpace(line)
-
-    if idx == len(line) - 1 || trimmed[len(trimmed) - 1] == ':' {
-        tokens = append(tokens, Token{Type: TokenTypeListStart, Value: strings.TrimSpace(line[:idx])})
-    } else if line[idx + 1] == ' ' {
-        tmp := strings.SplitN(line, ":", 2)
-        tokens = append(tokens, Token{Type: TokenTypeKey, Value: strings.TrimSpace(tmp[0])})
-        tokens = append(tokens, Token{Type: TokenTypeString, Value: strings.TrimSpace(tmp[1])})
-    }
-
-    return tokens
+    return content
 }
