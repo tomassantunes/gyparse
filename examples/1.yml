@@ -20,3 +20,10 @@ tutorial:
     born: 1996
 author: omkarbirade
 published: true
+test: null
+number1: 42
+number2: 0x14
+number3: 0o07
+number4: 3.14
+number5: -3.14e10
+
