@@ -1,6 +1,5 @@
 ---
 # test comment
-  # test comment 2 
 company: spacelift
 domain:
   - devops
@@ -26,4 +25,6 @@ number2: 0x14
 number3: 0o07
 number4: 3.14
 number5: -3.14e10
-
+number6: -42
+number7: "42"
+number8: 0b0111
