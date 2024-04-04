@@ -13,6 +13,10 @@ func main() {
 		fmt.Println(err)
 	}
 
-	tokens := lexer.Lex(string(input))
-	fmt.Println(tokens)
+	tokens, err := lexer.Lex(string(input))
+    if err != nil {
+        fmt.Println(err)
+    } else {
+	    fmt.Println(tokens)
+    }
 }

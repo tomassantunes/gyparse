@@ -1,22 +1,24 @@
+%YAML 1.2
+%TAG !u! tag:example.com,2000:
 ---
 # test comment
 company: spacelift
 domain:
-  - devops
-  - devsecops
+    - devops
+    - devsecops
 tutorial:
-  - yaml:
-    name: "YAML Ain't Markup Language"
-    type: awesome
-    born: 2001
-  - json:
-    name: JavaScript Object Notation
-    type: great
-    born: 2001
-  - xml:
-    name: Extensible Markup Language
-    type: good
-    born: 1996
+    - yaml:
+      name: "YAML Ain't Markup Language"
+      type: awesome
+      born: 2001
+    - json:
+      name: JavaScript Object Notation
+      type: great
+      born: 2001
+    - xml:
+      name: "Extensible Markup Language"
+      type: good
+      born: 1996
 author: omkarbirade
 published: true
 test: null
@@ -28,3 +30,23 @@ number5: -3.14e10
 number6: -42
 number7: "42"
 number8: 0b0111
+martin: { name: Martin D'vloper, job: Developer, skill: Elite }
+fruits: ["Apple", "Orange", "Strawberry", "Mango"]
+include_newlines: |
+    exactly as you see
+    will appear these three
+    lines of poetry
+fold_newlines: >
+    this is really a
+    single line of text
+    despite appearances
+vars:
+    service1:
+        config: &service_config
+            env: prod
+            retries: 3
+            version: 4.8
+    service2:
+        config: *service_config
+    service3:
+        config: *service_config
