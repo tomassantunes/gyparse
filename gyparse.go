@@ -5,6 +5,9 @@ import (
 	"github.com/tomassantunes/gyparse/parser"
 )
 
+// Parse takes a YAML string and returns its representation as a map.
+// It first tokenizes the input using the lexer, then parses the tokens
+// into a structured map. It returns an error if lexing or parsing fails.
 func Parse(input string) (map[string]interface{}, error) {
 	tokens, err := lexer.Lex(string(input))
 	if err != nil {
