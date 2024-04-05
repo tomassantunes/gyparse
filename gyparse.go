@@ -1,4 +1,4 @@
-package main
+package gyparse
 
 import (
 	"github.com/tomassantunes/gyparse/lexer"
