@@ -6,6 +6,14 @@ YAML parser made in Go.
 
 gyparse is a simple YAML parser made in Go. It is a simple and easy to use library that can be used to parse YAML files into objects that you can use in your golang projects.
 
+## How to install it?
+
+You can install gyparse using the `go get` command:
+
+```bash
+go get github.com/tomassantunes/gyparse@latest
+```
+
 ## How to use it?
 
 To use gyparse, you need to import the library into your project and then you can use the `Parse` function to parse a YAML file into an object. Here is an example:
@@ -33,14 +41,6 @@ func main() {
 
     fmt.Println(obj)
 }
-```
-
-## How to install it?
-
-You can install gyparse using the `go get` command:
-
-```bash
-go get github.com/tomassantunes/gyparse@v1.0.0
 ```
 
 ## Next steps
