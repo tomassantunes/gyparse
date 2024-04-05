@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/tomassantunes/gyparser/lexer"
-	"github.com/tomassantunes/gyparser/parser"
+	"github.com/tomassantunes/gyparse/lexer"
+	"github.com/tomassantunes/gyparse/parser"
 )
 
 func Parse(input string) (map[string]interface{}, error) {

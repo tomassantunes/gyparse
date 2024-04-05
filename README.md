@@ -17,7 +17,7 @@ import (
     "os"
     "fmt"
 
-	"github.com/tomassantunes/gyparser"
+	"github.com/tomassantunes/gyparse"
 )
 
 func main() {
@@ -40,7 +40,7 @@ func main() {
 You can install gyparse using the `go get` command:
 
 ```bash
-go get github.com/tomassantunes/gyparser@v1.0.0
+go get github.com/tomassantunes/gyparse@v1.0.0
 ```
 
 ## Next steps
