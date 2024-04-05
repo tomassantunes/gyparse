@@ -1,32 +1,20 @@
 package main
 
 import (
-	"fmt"
-	"os"
-
-	"gyparse/lexer"
-	"gyparse/parser"
+	"github.com/tomassantunes/gyparser/lexer"
+	"github.com/tomassantunes/gyparser/parser"
 )
 
-func main() {
-	input, err := os.ReadFile("./examples/1.yml")
-	if err != nil {
-		fmt.Println(err)
-	}
-
+func Parse(input string) (map[string]interface{}, error) {
 	tokens, err := lexer.Lex(string(input))
 	if err != nil {
-		fmt.Println(err)
-	} else {
-		fmt.Println("Tokens:")
-		fmt.Println(tokens)
+		return nil, err
 	}
 
 	obj, err := parser.Parse(tokens)
 	if err != nil {
-		fmt.Println(err)
-	} else {
-		fmt.Println("Parsed object:")
-		fmt.Println(obj)
+		return nil, err
 	}
+
+	return obj, nil
 }

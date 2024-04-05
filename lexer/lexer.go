@@ -20,7 +20,6 @@ const (
 
 	// Structural
 	DocumentStart TokenType = "DOC_START" // '---'
-	DocumentEnd   TokenType = "DOC_END"
 	Indent        TokenType = "INDENT"
 	Dedent        TokenType = "DEDENT"
 	ListItem      TokenType = "LIST_ITEM"     // '-'

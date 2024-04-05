@@ -6,11 +6,10 @@ import (
 	"strconv"
 	"strings"
 
-	"gyparse/lexer"
+	"github.com/tomassantunes/gyparser/lexer"
 )
 
 type ParseContext int
-
 const (
 	ContextNone ParseContext = iota
 	ContextMap
