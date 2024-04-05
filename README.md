@@ -25,7 +25,7 @@ import (
     "os"
     "fmt"
 
-	"github.com/tomassantunes/gyparse"
+    "github.com/tomassantunes/gyparse"
 )
 
 func main() {
